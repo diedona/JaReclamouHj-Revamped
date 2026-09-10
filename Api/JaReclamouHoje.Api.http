@@ -1,0 +1,16 @@
+@JaReclamouHoje.Api_HostAddress = http://localhost:5020
+
+GET {{JaReclamouHoje.Api_HostAddress}}/complaints
+Accept: application/json
+
+###
+
+POST {{JaReclamouHoje.Api_HostAddress}}/complaints
+Content-Type: application/json
+
+{
+  "title": "Elevator out of order",
+  "description": "The east building elevator has been broken for two weeks."
+}
+
+###
