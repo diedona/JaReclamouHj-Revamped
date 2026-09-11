@@ -1,11 +1,11 @@
-@JaReclamouHoje.Api_HostAddress = http://localhost:5020
+@JaReclamouHoje.Api_HostAddress = http://localhost:5001
 
-GET {{JaReclamouHoje.Api_HostAddress}}/complaints
+GET {{JaReclamouHoje.Api_HostAddress}}/api/complaints
 Accept: application/json
 
 ###
 
-POST {{JaReclamouHoje.Api_HostAddress}}/complaints
+POST {{JaReclamouHoje.Api_HostAddress}}/api/complaints
 Content-Type: application/json
 
 {

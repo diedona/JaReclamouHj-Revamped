@@ -6,13 +6,16 @@ namespace JaReclamouHoje.Api.Endpoints;
 
 public static class ComplaintEndpoints
 {
-    public static IEndpointRouteBuilder MapComplaintEndpoints(this IEndpointRouteBuilder endpoints)
+    public static IEndpointRouteBuilder MapComplaintEndpoints(this IEndpointRouteBuilder endpointBuilder)
     {
-        endpoints.MapGet("/complaints", async (IComplaintService service, CancellationToken cancellationToken) =>
+        var group = endpointBuilder.MapGroup("/api/complaints")
+            .WithDisplayName("Complaints");
+
+        group.MapGet("/", async (IComplaintService service, CancellationToken cancellationToken) =>
             TypedResults.Ok(await service.GetAllAsync(cancellationToken)))
             .WithName("GetComplaints");
 
-        endpoints.MapGet("/complaints/{id}", async Task<Results<Ok<ComplaintResponse>, NotFound>> (
+        group.MapGet("/{id}", async Task<Results<Ok<ComplaintResponse>, NotFound>> (
             Guid id,
             IComplaintService service,
             CancellationToken cancellationToken) =>
@@ -24,7 +27,7 @@ public static class ComplaintEndpoints
         })
             .WithName("GetComplaintById");
 
-        endpoints.MapPost("/complaints", async Task<Created<ComplaintResponse>> (
+        group.MapPost("/", async Task<Created<ComplaintResponse>> (
             CreateComplaintRequest request,
             IComplaintService service,
             CancellationToken cancellationToken) =>
@@ -34,6 +37,6 @@ public static class ComplaintEndpoints
         })
             .WithName("CreateComplaint");
 
-        return endpoints;
+        return endpointBuilder;
     }
 }
