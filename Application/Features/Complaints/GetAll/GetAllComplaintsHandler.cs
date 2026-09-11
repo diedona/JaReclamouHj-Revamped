@@ -12,6 +12,6 @@ public class GetAllComplaintsHandler(
     public async Task<GetAllComplaintsResponse> Handle(GetAllComplaintsQuery request, CancellationToken cancellationToken)
     {
         var complaints = await _complaintRepository.GetAllAsync(cancellationToken);
-        return GetAllComplaintsResponse.CreateFromEntities(complaints.AsEnumerable());
+        return GetAllComplaintsResponse.CreateFromEntities(complaints);
     }
 }

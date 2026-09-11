@@ -6,7 +6,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 builder.Services.AddApplication();
-builder.Services.AddMediatr();
 builder.Services.AddInfrastructure();
 
 var app = builder.Build();
