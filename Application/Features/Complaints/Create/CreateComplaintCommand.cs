@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace JaReclamouHoje.Application.Features.Complaints.CreateComplaint;
+namespace JaReclamouHoje.Application.Features.Complaints.Create;
 
 public record CreateComplaintCommand(
     string Title, 

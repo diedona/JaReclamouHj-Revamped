@@ -1,4 +1,5 @@
-using JaReclamouHoje.Application.Features.Complaints.CreateComplaint;
+using JaReclamouHoje.Application.Features.Complaints.Create;
+using JaReclamouHoje.Application.Features.Complaints.GetAll;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -11,9 +12,14 @@ public static class ComplaintEndpoints
         var group = endpointBuilder.MapGroup("/api/complaints")
             .WithDisplayName("Complaints");
 
-        //group.MapGet("/", async (IComplaintService service, CancellationToken cancellationToken) =>
-        //    TypedResults.Ok(await service.GetAllAsync(cancellationToken)))
-        //    .WithName("GetComplaints");
+        group.MapGet("/", async (
+            ISender mediatr,
+            CancellationToken cancellationToken
+        ) =>
+        {
+            var complaints = await mediatr.Send(new GetAllComplaintsQuery(), cancellationToken);
+            return TypedResults.Ok(complaints);
+        }).WithName("GetComplaints");
 
         //group.MapGet("/{id}", async Task<Results<Ok<ComplaintResponse>, NotFound>> (
         //    Guid id,

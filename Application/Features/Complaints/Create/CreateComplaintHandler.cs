@@ -2,7 +2,7 @@
 using JaReclamouHoje.Domain.Entities;
 using MediatR;
 
-namespace JaReclamouHoje.Application.Features.Complaints.CreateComplaint;
+namespace JaReclamouHoje.Application.Features.Complaints.Create;
 
 public class CreateComplaintHandler(
     IComplaintRepository complaintRepository

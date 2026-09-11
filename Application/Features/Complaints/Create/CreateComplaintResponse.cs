@@ -1,6 +1,6 @@
 ﻿using JaReclamouHoje.Domain.Entities;
 
-namespace JaReclamouHoje.Application.Features.Complaints.CreateComplaint;
+namespace JaReclamouHoje.Application.Features.Complaints.Create;
 
 public record CreateComplaintResponse(
     Guid Id,
