@@ -7,9 +7,9 @@ namespace JaReclamouHoje.Api.Endpoints;
 
 public static class ComplaintEndpoints
 {
-    public static IEndpointRouteBuilder MapComplaintEndpoints(this IEndpointRouteBuilder endpointBuilder)
+    public static IEndpointRouteBuilder MapComplaintEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = endpointBuilder.MapGroup("/api/complaints")
+        var group = app.MapGroup("/api/complaints")
             .WithDisplayName("Complaints");
 
         group.MapGet("/", async (
@@ -40,9 +40,8 @@ public static class ComplaintEndpoints
         {
             var complaint = await mediatr.Send(request, cancellationToken);
             return TypedResults.Created($"/complaints/{complaint.Id}", complaint);
-        })
-            .WithName("CreateComplaint");
+        }).WithName("CreateComplaint");
 
-        return endpointBuilder;
+        return app;
     }
 }
