@@ -1,4 +1,4 @@
-﻿using JaReclamouHoje.Domain.Abstractions;
+﻿using JaReclamouHoje.Domain.Repositories;
 using MediatR;
 
 namespace JaReclamouHoje.Application.Features.Complaints.GetAll;

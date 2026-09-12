@@ -1,4 +1,4 @@
-using JaReclamouHoje.Domain.Abstractions;
+using JaReclamouHoje.Domain.Repositories;
 using JaReclamouHoje.Infra.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 

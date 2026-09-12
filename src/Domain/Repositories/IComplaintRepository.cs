@@ -1,6 +1,6 @@
 using JaReclamouHoje.Domain.Entities;
 
-namespace JaReclamouHoje.Domain.Abstractions;
+namespace JaReclamouHoje.Domain.Repositories;
 
 public interface IComplaintRepository
 {

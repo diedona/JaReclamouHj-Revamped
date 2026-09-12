@@ -1,5 +1,5 @@
-﻿using JaReclamouHoje.Domain.Abstractions;
-using JaReclamouHoje.Domain.Entities;
+﻿using JaReclamouHoje.Domain.Entities;
+using JaReclamouHoje.Domain.Repositories;
 using MediatR;
 
 namespace JaReclamouHoje.Application.Features.Complaints.Create;

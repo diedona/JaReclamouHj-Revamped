@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
-using JaReclamouHoje.Domain.Abstractions;
 using JaReclamouHoje.Domain.Entities;
+using JaReclamouHoje.Domain.Repositories;
 
 namespace JaReclamouHoje.Infra.Repositories;
 
