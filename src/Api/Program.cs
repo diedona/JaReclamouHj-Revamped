@@ -1,22 +1,47 @@
+using JaReclamouHoje.Api;
 using JaReclamouHoje.Api.Endpoints;
 using JaReclamouHoje.Application;
 using JaReclamouHoje.Infra;
+using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateLogger();
 
-builder.Services.AddOpenApi();
-builder.Services.AddApplication();
-builder.Services.AddInfrastructure();
-
-var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
+try
 {
-    app.MapOpenApi();
+	Log.Information("Starting API...");
+
+	var builder = WebApplication.CreateBuilder(args);
+
+	builder.Services.AddOpenApi();
+	builder.AddSerilog();
+	builder.Services.AddApplication();
+	builder.Services.AddInfrastructure();
+	builder.Services.AddProblemDetails();
+
+	var app = builder.Build();
+
+	if (app.Environment.IsDevelopment())
+	{
+		app.MapOpenApi();
+	}
+
+	app.UseExceptionHandler();
+
+	app.UseStatusCodePages();
+	app.UseSerilogRequestLogging();
+	app.UseHttpsRedirection();
+
+	app.MapComplaintEndpoints();
+
+	app.Run();
 }
-
-app.UseHttpsRedirection();
-
-app.MapComplaintEndpoints();
-
-app.Run();
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+	Log.CloseAndFlush();
+}

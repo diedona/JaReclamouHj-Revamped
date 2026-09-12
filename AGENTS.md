@@ -43,3 +43,5 @@ Clean Architecture with dependency direction: **Domain → Application → Infra
 - **Only 1 scaffold test exists** — no real test coverage yet
 - **No CI/CD, no README, no linting config** — project is early-stage
 - **.vs/ folder** is tracked — it contains Visual Studio workspace files
+- **Always boot-test with `dotnet run --project Api` from `src/`** — never exec the compiled `bin/.../JaReclamouHoje.Api.dll` from a random working directory. Content root follows the CWD, so a wrong CWD hides `appsettings.json`: Serilog's `ReadFrom.Configuration` finds no `Serilog` section → zero sinks → silent console, which reads as a "hang"/"crash" while the app is actually serving (or failing startup invisibly). A fallback Console sink in `AddSerilog()` keeps the logger noisy instead of mute.
+- **Before diagnosing a startup hang**, confirm it's real: check for `Now listening` in logs, `curl /api/complaints`, and check the process (Kestrel Heartbeat/SocketEngine threads run even with a silent logger). Slow cold-start + silent logger has produced several false "hang" reports.
