@@ -16,5 +16,5 @@ Content-Type: application/json
 
 ###
 
-GET {{JaReclamouHoje.Api_HostAddress}}/api/complaints/a2bb19c4-9900-4e15-883d-5cd96817062d
+GET {{JaReclamouHoje.Api_HostAddress}}/api/complaints/
 Accept: application/json

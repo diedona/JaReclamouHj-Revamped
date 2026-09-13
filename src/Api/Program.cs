@@ -20,6 +20,8 @@ try
 	builder.Services.AddApplication();
 	builder.Services.AddInfrastructure();
 	builder.Services.AddProblemDetails();
+
+	builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
 	builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 	var app = builder.Build();
