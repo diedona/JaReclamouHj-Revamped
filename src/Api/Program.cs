@@ -1,5 +1,6 @@
 using JaReclamouHoje.Api;
 using JaReclamouHoje.Api.Endpoints;
+using JaReclamouHoje.Api.ExceptionHandlers;
 using JaReclamouHoje.Application;
 using JaReclamouHoje.Infra;
 using Serilog;
@@ -19,6 +20,7 @@ try
 	builder.Services.AddApplication();
 	builder.Services.AddInfrastructure();
 	builder.Services.AddProblemDetails();
+	builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 	var app = builder.Build();
 

@@ -15,10 +15,6 @@ public class CreateComplaintHandler(
 
     public async Task<ComplaintResponse> Handle(CreateComplaintCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Test - {@request}", 
-            request
-        );
-
         var complaint = Complaint.Create(request.Title, request.Description);
         await _complaintRepository.AddAsync(complaint, cancellationToken);
         return ComplaintResponse.FromEntity(complaint);
