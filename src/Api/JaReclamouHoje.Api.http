@@ -16,5 +16,16 @@ Content-Type: application/json
 
 ###
 
+# @name createRequest
+POST {{JaReclamouHoje.Api_HostAddress}}/api/complaints
+Content-Type: application/json
+
+{
+  "title": "T",
+  "description": "Title is not lengthy enough."
+}
+
+###
+
 GET {{JaReclamouHoje.Api_HostAddress}}/api/complaints/
 Accept: application/json

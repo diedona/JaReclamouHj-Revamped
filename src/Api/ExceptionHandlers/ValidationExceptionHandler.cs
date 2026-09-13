@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
+using JaReclamouHoje.Domain.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
+using System.Net;
 
 namespace JaReclamouHoje.Api.ExceptionHandlers;
 
@@ -34,6 +36,7 @@ public class ValidationExceptionHandler(
             Errors = errors
         };
 
+        httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
         return await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext
         {
             HttpContext = httpContext,
