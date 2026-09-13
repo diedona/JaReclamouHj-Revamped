@@ -1,37 +1,44 @@
-﻿using JaReclamouHoje.Domain.Exceptions;
+﻿using JaReclamouHoje.Application.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
-using System.Net;
+using Microsoft.AspNetCore.Mvc;
 
 namespace JaReclamouHoje.Api.ExceptionHandlers;
 
 public class GlobalExceptionHandler(
-    IProblemDetailsService problemDetailsService
+    IProblemDetailsService problemDetailsService,
+    ILogger<GlobalExceptionHandler> logger
 ) : IExceptionHandler
 {
     private readonly IProblemDetailsService _problemDetailsService = problemDetailsService;
+    private readonly ILogger<GlobalExceptionHandler> _logger = logger;
 
     public async ValueTask<bool> TryHandleAsync(
-        HttpContext httpContext, 
-        Exception exception, 
-        CancellationToken cancellationToken
-    )
+        HttpContext httpContext,
+        Exception exception,
+        CancellationToken cancellationToken)
     {
-        if (exception is not CustomApplicationException customApplicationException)
-        {
-            return false;
-        }
+        _logger.LogError(exception, "Unhandled exception occurred: {Message}", exception.Message);
 
-        httpContext.Response.StatusCode = (int)customApplicationException.StatusCode;
-        var problemDetails = new HttpValidationProblemDetails()
+        var statusCode = exception switch
         {
-            Status = customApplicationException.StatusCode switch
-            {
-                HttpStatusCode.BadRequest => StatusCodes.Status400BadRequest,
-                _ => StatusCodes.Status500InternalServerError
-            },
-            Title = "An error ocurred",
-            Detail = customApplicationException.Message
+            CustomApplicationException customException => customException.StatusCode,
+            _ => StatusCodes.Status500InternalServerError
         };
+
+        var problemDetails = new ProblemDetails
+        {
+            Status = statusCode,
+            Title = exception switch
+            {
+                CustomApplicationException => "An application error occurred.",
+                _ => "An unexpected error occurred."
+            },
+            Detail = exception is CustomApplicationException
+                ? exception.Message
+                : "Please try again later."
+        };
+
+        httpContext.Response.StatusCode = statusCode;
 
         return await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext
         {
@@ -39,6 +46,5 @@ public class GlobalExceptionHandler(
             ProblemDetails = problemDetails,
             Exception = exception
         });
-        
     }
 }

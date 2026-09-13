@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
-using JaReclamouHoje.Domain.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
-using System.Net;
+using Microsoft.AspNetCore.Mvc;
 
 namespace JaReclamouHoje.Api.ExceptionHandlers;
 
@@ -32,11 +31,12 @@ public class ValidationExceptionHandler(
         var problemDetails = new HttpValidationProblemDetails()
         {
             Status = StatusCodes.Status400BadRequest,
-            Title = "One or more validation erros ocurred.",
+            Title = "One or more validation errors occurred.",
             Errors = errors
         };
 
-        httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+        httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+
         return await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext
         {
             HttpContext = httpContext,

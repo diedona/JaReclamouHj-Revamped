@@ -8,6 +8,6 @@ public class GetComplaintByIdValidator : AbstractValidator<GetComplaintByIdQuery
     {
         RuleFor(x => x.Id)
             .NotEmpty()
-            .WithMessage("IdCantBeNull");
+            .WithMessage("Id cannot be empty.");
     }
 }
