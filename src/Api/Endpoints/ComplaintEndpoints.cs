@@ -1,3 +1,4 @@
+using JaReclamouHoje.Api.Authorization;
 using JaReclamouHoje.Application.Features.Complaints;
 using JaReclamouHoje.Application.Features.Complaints.Create;
 using JaReclamouHoje.Application.Features.Complaints.GetAll;
@@ -43,7 +44,8 @@ public static class ComplaintEndpoints
         {
             var complaint = await sender.Send(request, cancellationToken);
             return TypedResults.CreatedAtRoute(complaint, "GetComplaintById", new { id = complaint.Id });
-        }).WithName("CreateComplaint");
+        }).WithName("CreateComplaint")
+        .RequireAuthorization(Policies.AdminOnly);
 
         return group;
     }

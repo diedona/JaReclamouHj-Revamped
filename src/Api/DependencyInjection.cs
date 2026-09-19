@@ -1,5 +1,8 @@
+using System.Security.Claims;
 using System.Text;
+using JaReclamouHoje.Api.Authorization;
 using JaReclamouHoje.Application.Common.Options;
+using JaReclamouHoje.Domain.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -54,7 +57,7 @@ public static class DependencyInjection
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero,
                     NameClaimType = "name",
-                    RoleClaimType = "role"
+                    RoleClaimType = ClaimTypes.Role
                 };
 
                 options.Events = new JwtBearerEvents
@@ -86,7 +89,8 @@ public static class DependencyInjection
                 };
             });
 
-        services.AddAuthorization();
+        services.AddAuthorizationBuilder()
+            .AddPolicy(Policies.AdminOnly, policy => policy.RequireRole(UserRoles.Admin));
 
         return services;
     }

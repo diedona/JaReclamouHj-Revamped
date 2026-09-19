@@ -25,7 +25,8 @@ public class RegisterUserHandler(
         }
 
         var passwordHash = _passwordHasher.HashPassword(request.Password);
-        var user = User.Create(request.Name, request.Email, passwordHash);
+        var role = string.IsNullOrWhiteSpace(request.Role) ? UserRoles.User : request.Role.Trim();
+        var user = User.Create(request.Name, request.Email, passwordHash, role);
 
         await _userRepository.AddAsync(user, cancellationToken);
 
