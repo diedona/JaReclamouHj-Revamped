@@ -1,6 +1,7 @@
 using JaReclamouHoje.Application.Common.Interfaces;
 using JaReclamouHoje.Domain.Entities;
 using JaReclamouHoje.Domain.Repositories;
+using static JaReclamouHoje.Application.Common.Interfaces.IJwtTokenGenerator;
 
 namespace JaReclamouHoje.Tests;
 
@@ -14,7 +15,7 @@ public class FakePasswordHasher : IPasswordHasher
 
 public class FakeJwtTokenGenerator : IJwtTokenGenerator
 {
-    public string GenerateToken(User user) => $"token-for-{user.Email}";
+    public JwtTokenResult GenerateToken(User user) => new($"token-for-{user.Email}", 3600);
 }
 
 public class FakeUserRepository : IUserRepository

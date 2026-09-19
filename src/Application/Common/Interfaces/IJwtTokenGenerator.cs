@@ -4,5 +4,11 @@ namespace JaReclamouHoje.Application.Common.Interfaces;
 
 public interface IJwtTokenGenerator
 {
-    string GenerateToken(User user);
+    JwtTokenResult GenerateToken(User user);
+
+    #region [ NESTED CLASSES ]
+
+    public sealed record JwtTokenResult(string Token, int ExpiresInSeconds); 
+
+    #endregion
 }

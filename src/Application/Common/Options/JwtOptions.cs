@@ -1,4 +1,4 @@
-namespace JaReclamouHoje.Infra.Authentication;
+namespace JaReclamouHoje.Application.Common.Options;
 
 public class JwtOptions
 {

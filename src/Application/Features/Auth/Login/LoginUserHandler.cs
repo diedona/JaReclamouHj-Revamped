@@ -15,7 +15,10 @@ public class LoginUserHandler(
     private readonly IPasswordHasher _passwordHasher = passwordHasher;
     private readonly IJwtTokenGenerator _jwtTokenGenerator = jwtTokenGenerator;
 
-    public async Task<AuthResponse> Handle(LoginUserCommand request, CancellationToken cancellationToken)
+    public async Task<AuthResponse> Handle(
+        LoginUserCommand request, 
+        CancellationToken cancellationToken
+    )
     {
         var user = await _userRepository.GetByEmailAsync(request.Email, cancellationToken);
         if (user is null || !_passwordHasher.VerifyPassword(request.Password, user.PasswordHash))
@@ -24,6 +27,6 @@ public class LoginUserHandler(
         }
 
         var token = _jwtTokenGenerator.GenerateToken(user);
-        return AuthResponse.Create(user, token, 3600);
+        return AuthResponse.Create(user, token.Token, token.ExpiresInSeconds);
     }
 }

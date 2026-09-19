@@ -9,6 +9,8 @@ public class InMemoryUserRepository : IUserRepository
 {
     private readonly ConcurrentDictionary<Guid, User> _users = new();
 
+    // TODO: why are we direct coupling here? 
+    // lets try to remove this and depend only on the CTOR with the DI
     public InMemoryUserRepository() : this(new Authentication.PasswordHasher())
     {
     }

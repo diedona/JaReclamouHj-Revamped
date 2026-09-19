@@ -30,6 +30,6 @@ public class RegisterUserHandler(
         await _userRepository.AddAsync(user, cancellationToken);
 
         var token = _jwtTokenGenerator.GenerateToken(user);
-        return AuthResponse.Create(user, token, 3600);
+        return AuthResponse.Create(user, token.Token, token.ExpiresInSeconds);
     }
 }

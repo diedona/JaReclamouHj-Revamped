@@ -2,9 +2,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using JaReclamouHoje.Application.Common.Interfaces;
+using JaReclamouHoje.Application.Common.Options;
 using JaReclamouHoje.Domain.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using static JaReclamouHoje.Application.Common.Interfaces.IJwtTokenGenerator;
 
 namespace JaReclamouHoje.Infra.Authentication;
 
@@ -12,7 +14,7 @@ public class JwtTokenGenerator(IOptions<JwtOptions> jwtOptions) : IJwtTokenGener
 {
     private readonly JwtOptions _jwtOptions = jwtOptions.Value;
 
-    public string GenerateToken(User user)
+    public JwtTokenResult GenerateToken(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_jwtOptions.SecretKey);
@@ -38,6 +40,8 @@ public class JwtTokenGenerator(IOptions<JwtOptions> jwtOptions) : IJwtTokenGener
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+        return new JwtTokenResult(
+            tokenHandler.WriteToken(token),
+            _jwtOptions.ExpirationInMinutes * 60);
     }
 }

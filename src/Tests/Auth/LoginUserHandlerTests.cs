@@ -18,6 +18,7 @@ public class LoginUserHandlerTests
 
         Assert.Equal("diedona@gmail.com", response.Email);
         Assert.Equal("token-for-diedona@gmail.com", response.Token);
+        Assert.Equal(3600, response.ExpiresInSeconds);
     }
 
     [Fact]

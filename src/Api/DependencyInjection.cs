@@ -1,5 +1,5 @@
 using System.Text;
-using JaReclamouHoje.Infra.Authentication;
+using JaReclamouHoje.Application.Common.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
