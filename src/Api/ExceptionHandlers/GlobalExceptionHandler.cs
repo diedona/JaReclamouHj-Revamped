@@ -22,6 +22,7 @@ public class GlobalExceptionHandler(
         var statusCode = exception switch
         {
             CustomApplicationException customException => customException.StatusCode,
+            BadHttpRequestException badHttpRequestException => badHttpRequestException.StatusCode,
             _ => StatusCodes.Status500InternalServerError
         };
 
@@ -31,11 +32,15 @@ public class GlobalExceptionHandler(
             Title = exception switch
             {
                 CustomApplicationException => "An application error occurred.",
+                BadHttpRequestException => "Bad Request",
                 _ => "An unexpected error occurred."
             },
-            Detail = exception is CustomApplicationException
-                ? exception.Message
-                : "Please try again later."
+            Detail = exception switch
+            {
+                CustomApplicationException customException => customException.Message,
+                BadHttpRequestException => "Your request seems to be invalid. Check required parameters in URL and/or body.",
+                _ => "Please try again later."
+            }
         };
 
         httpContext.Response.StatusCode = statusCode;

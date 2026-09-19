@@ -35,6 +35,7 @@ Clean Architecture with dependency direction: **Domain → Application → Infra
 - **Entities** are currently immutable (private constructor, public constructor with all props, static `Create()` factory) — early stage, not a hard rule yet
 - **Response records** use `FromEntity()` static method to map from domain entities
 - **Namespaces** follow folder structure: `JaReclamouHoje.{Layer}.{Feature}`
+- **Contract-owned return types** are nested inside the abstraction that owns them (e.g. `JwtTokenResult` nested in `IJwtTokenGenerator`) — a result is meaningless outside the operation that produces it; this coupling is intentional and keeps related types cohesive. Do not create standalone result files in `Common/Interfaces/`.
 - Solution uses `.slnx` format (XML, not traditional `.sln`)
 
 ## Gotchas

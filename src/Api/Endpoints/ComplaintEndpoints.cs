@@ -13,7 +13,8 @@ public static class ComplaintEndpoints
     {
         var group = app.MapGroup("/api/complaints")
             .WithTags("Complaints")
-            .WithDisplayName("Complaints");
+            .WithDisplayName("Complaints")
+            .RequireAuthorization();
 
         group.MapGet("", async (
             ISender sender,

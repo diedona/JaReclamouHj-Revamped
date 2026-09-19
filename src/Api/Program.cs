@@ -1,6 +1,7 @@
 using JaReclamouHoje.Api;
 using JaReclamouHoje.Api.Endpoints;
 using JaReclamouHoje.Api.ExceptionHandlers;
+using JaReclamouHoje.Api.OpenApi;
 using JaReclamouHoje.Application;
 using JaReclamouHoje.Infra;
 using Serilog;
@@ -15,7 +16,11 @@ try
 
 	var builder = WebApplication.CreateBuilder(args);
 
-	builder.Services.AddOpenApi();
+	builder.Services.AddAuthenticationServices(builder.Configuration);
+	builder.Services.AddOpenApi(options =>
+	{
+		options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+	});
 	builder.AddSerilog();
 	builder.Services.AddApplication();
 	builder.Services.AddInfrastructure();
@@ -37,6 +42,10 @@ try
 	app.UseSerilogRequestLogging();
 	app.UseHttpsRedirection();
 
+	app.UseAuthentication();
+	app.UseAuthorization();
+
+	app.MapAuthEndpoints();
 	app.MapComplaintEndpoints();
 
 	app.Run();
