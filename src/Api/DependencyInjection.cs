@@ -1,9 +1,13 @@
-using System.Text;
+using JaReclamouHoje.Api.Authentication;
+using JaReclamouHoje.Api.Authorization;
+using JaReclamouHoje.Application.Common.Interfaces;
 using JaReclamouHoje.Application.Common.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.Security.Claims;
+using System.Text;
 
 namespace JaReclamouHoje.Api;
 
@@ -54,7 +58,7 @@ public static class DependencyInjection
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero,
                     NameClaimType = "name",
-                    RoleClaimType = "role"
+                    RoleClaimType = ClaimTypes.Role
                 };
 
                 options.Events = new JwtBearerEvents
@@ -86,7 +90,10 @@ public static class DependencyInjection
                 };
             });
 
-        services.AddAuthorization();
+        services.AddAuthorizationPolicies();
+
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUser, HttpContextCurrentUser>();
 
         return services;
     }

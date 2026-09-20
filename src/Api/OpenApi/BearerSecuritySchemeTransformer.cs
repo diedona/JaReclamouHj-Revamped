@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 
@@ -25,9 +22,11 @@ public sealed class BearerSecuritySchemeTransformer : IOpenApiDocumentTransforme
         document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
         document.Components.SecuritySchemes["Bearer"] = scheme;
 
-        document.Security ??= new List<OpenApiSecurityRequirement>();
-        var requirement = new OpenApiSecurityRequirement();
-        requirement.Add(new OpenApiSecuritySchemeReference("Bearer", document, null), new List<string>());
+        document.Security ??= [];
+        var requirement = new OpenApiSecurityRequirement
+        {
+            { new OpenApiSecuritySchemeReference("Bearer", document, null), new List<string>() }
+        };
         document.Security.Add(requirement);
 
         return Task.CompletedTask;
