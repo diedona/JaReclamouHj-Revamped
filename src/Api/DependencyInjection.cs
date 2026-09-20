@@ -1,12 +1,13 @@
-using System.Security.Claims;
-using System.Text;
+using JaReclamouHoje.Api.Authentication;
 using JaReclamouHoje.Api.Authorization;
+using JaReclamouHoje.Application.Common.Interfaces;
 using JaReclamouHoje.Application.Common.Options;
-using JaReclamouHoje.Domain.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.Security.Claims;
+using System.Text;
 
 namespace JaReclamouHoje.Api;
 
@@ -89,8 +90,10 @@ public static class DependencyInjection
                 };
             });
 
-        services.AddAuthorizationBuilder()
-            .AddPolicy(Policies.AdminOnly, policy => policy.RequireRole(UserRoles.Admin));
+        services.AddAuthorizationPolicies();
+
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUser, HttpContextCurrentUser>();
 
         return services;
     }

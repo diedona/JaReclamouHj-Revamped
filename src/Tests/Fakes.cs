@@ -18,6 +18,22 @@ public class FakeJwtTokenGenerator : IJwtTokenGenerator
     public JwtTokenResult GenerateToken(User user) => new($"token-for-{user.Email}", 3600);
 }
 
+public class FakeCurrentUser(
+    bool isAuthenticated = false,
+    Guid? userId = null,
+    string? role = null
+) : ICurrentUser
+{
+    public bool IsAuthenticated => isAuthenticated;
+
+    public Guid? UserId => userId;
+
+    public string? Role => role;
+
+    public bool IsInRole(string role) =>
+        isAuthenticated && string.Equals(Role, role, StringComparison.Ordinal);
+}
+
 public class FakeUserRepository : IUserRepository
 {
     private readonly Dictionary<string, User> _usersByEmail = new(StringComparer.OrdinalIgnoreCase);

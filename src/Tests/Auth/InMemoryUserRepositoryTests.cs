@@ -1,3 +1,4 @@
+using JaReclamouHoje.Domain.Entities;
 using JaReclamouHoje.Infra.Authentication;
 using JaReclamouHoje.Infra.Repositories;
 
@@ -14,7 +15,7 @@ public class InMemoryUserRepositoryTests
 
         Assert.NotNull(user);
         Assert.Equal("diedona", user.Name);
-        Assert.Equal("admin", user.Role);
+        Assert.Equal(UserRoles.Admin, user.Role);
         Assert.True(new PasswordHasher().VerifyPassword("123123", user.PasswordHash));
     }
 

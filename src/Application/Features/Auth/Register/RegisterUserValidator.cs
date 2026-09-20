@@ -20,7 +20,7 @@ public class RegisterUserValidator : AbstractValidator<RegisterUserCommand>
             .MinimumLength(6).WithMessage("Password must be at least 6 characters long.");
 
         RuleFor(x => x.Role)
-            .Must(role => string.IsNullOrWhiteSpace(role) || role.Trim() == UserRoles.User)
-            .WithMessage("Role must be 'User' or omitted. Admin accounts cannot be self-registered.");
+            .Must(role => string.IsNullOrWhiteSpace(role) || role.Trim() == UserRoles.User || role.Trim() == UserRoles.Admin)
+            .WithMessage("Role must be 'User' or 'Admin'.");
     }
 }

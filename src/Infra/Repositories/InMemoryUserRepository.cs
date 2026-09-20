@@ -54,7 +54,7 @@ public class InMemoryUserRepository : IUserRepository
             "diedona",
             "diedona@gmail.com",
             passwordHash,
-            "admin",
+            UserRoles.Admin,
             DateTime.UtcNow);
 
         _users.TryAdd(defaultUser.Id, defaultUser);
