@@ -1,3 +1,4 @@
+using JaReclamouHoje.Application.Common.Interfaces;
 using JaReclamouHoje.Domain.Entities;
 using JaReclamouHoje.Infra.Authentication;
 using JaReclamouHoje.Infra.Repositories;
@@ -6,10 +7,12 @@ namespace JaReclamouHoje.Tests.Auth;
 
 public class InMemoryUserRepositoryTests
 {
+    private readonly IPasswordHasher _passwordHasher = new PasswordHasher();
+
     [Fact]
     public async Task Default_User_Is_Seeded_With_Password_123123()
     {
-        var repository = new InMemoryUserRepository();
+        var repository = new InMemoryUserRepository(_passwordHasher);
 
         var user = await repository.GetByEmailAsync("diedona@gmail.com");
 
@@ -22,7 +25,7 @@ public class InMemoryUserRepositoryTests
     [Fact]
     public async Task GetByEmail_Is_CaseInsensitive()
     {
-        var repository = new InMemoryUserRepository();
+        var repository = new InMemoryUserRepository(_passwordHasher);
 
         var user = await repository.GetByEmailAsync("DIEDONA@GMAIL.COM");
 
@@ -32,7 +35,7 @@ public class InMemoryUserRepositoryTests
     [Fact]
     public async Task AddAsync_Makes_User_Retrievable()
     {
-        var repository = new InMemoryUserRepository();
+        var repository = new InMemoryUserRepository(_passwordHasher);
         var newUser = Domain.Entities.User.Create("Tester", "tester@test.com", "hashed:password");
 
         await repository.AddAsync(newUser);
