@@ -22,4 +22,10 @@ public sealed class InMemoryComplaintRepository : IComplaintRepository
         _complaints[complaint.Id] = complaint;
         return Task.CompletedTask;
     }
+
+    public Task UpdateAsync(Complaint complaint, CancellationToken cancellationToken = default)
+    {
+        _complaints[complaint.Id] = complaint;
+        return Task.CompletedTask;
+    }
 }

@@ -1,6 +1,9 @@
+using FluentValidation;
+using JaReclamouHoje.Domain.Common.Validation;
 using JaReclamouHoje.Domain.Entities;
 using JaReclamouHoje.Domain.Exceptions;
 using JaReclamouHoje.Domain.Services;
+using JaReclamouHoje.Domain.ValueObjects;
 
 namespace JaReclamouHoje.Tests.Complaints;
 
@@ -22,9 +25,15 @@ public class ComplaintCancellationTests
     }
 
     [Fact]
-    public void Create_WithoutOwner_Throws()
+    public void Create_WithoutOwner_ThrowsValidation()
     {
-        Assert.Throws<ArgumentException>(() => Complaint.Create("Title", "Description", Guid.Empty));
+        Assert.Throws<ValidationException>(() => Complaint.Create("Title", "Description", Guid.Empty));
+    }
+
+    [Fact]
+    public void Create_WithoutTitle_ThrowsValidation()
+    {
+        Assert.Throws<ValidationException>(() => Complaint.Create("  ", "Description", Guid.NewGuid()));
     }
 
     [Fact]
@@ -34,7 +43,7 @@ public class ComplaintCancellationTests
         var canceledBy = Guid.NewGuid();
         var at = DateTimeOffset.UtcNow;
 
-        complaint.Cancel(canceledBy, "Duplicate report.", at);
+        complaint.Cancel(ComplaintCancellationVO.Create(canceledBy, "Duplicate report.", at));
 
         Assert.True(complaint.IsCanceled);
         Assert.NotNull(complaint.Cancellation);
@@ -44,34 +53,44 @@ public class ComplaintCancellationTests
     }
 
     [Fact]
+    public void Cancel_TrimsReason()
+    {
+        var complaint = CreateOwnedComplaint();
+
+        complaint.Cancel(ComplaintCancellationVO.Create(Guid.NewGuid(), "  Duplicate report.  ", DateTimeOffset.UtcNow));
+
+        Assert.Equal("Duplicate report.", complaint.Cancellation!.Reason);
+    }
+
+    [Fact]
     public void Cancel_Twice_Throws()
     {
         var complaint = CreateOwnedComplaint();
-        complaint.Cancel(Guid.NewGuid(), "First reason.", DateTimeOffset.UtcNow);
+        complaint.Cancel(ComplaintCancellationVO.Create(Guid.NewGuid(), "First reason.", DateTimeOffset.UtcNow));
 
         Assert.Throws<ComplaintAlreadyCanceledException>(
-            () => complaint.Cancel(Guid.NewGuid(), "Second reason.", DateTimeOffset.UtcNow));
+            () => complaint.Cancel(ComplaintCancellationVO.Create(Guid.NewGuid(), "Second reason.", DateTimeOffset.UtcNow)));
     }
 
     [Theory]
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public void Cancel_WithoutReason_Throws(string? reason)
+    public void Cancel_WithoutReason_ThrowsValidation(string? reason)
     {
         var complaint = CreateOwnedComplaint();
 
-        Assert.Throws<ArgumentException>(
-            () => complaint.Cancel(Guid.NewGuid(), reason!, DateTimeOffset.UtcNow));
+        Assert.Throws<ValidationException>(
+            () => complaint.Cancel(ComplaintCancellationVO.Create(Guid.NewGuid(), reason!, DateTimeOffset.UtcNow)));
     }
 
     [Fact]
-    public void Cancel_ReasonTooLong_Throws()
+    public void Cancel_ReasonTooLong_ThrowsValidation()
     {
         var complaint = CreateOwnedComplaint();
 
-        Assert.Throws<ArgumentOutOfRangeException>(
-            () => complaint.Cancel(Guid.NewGuid(), new string('x', ComplaintCancellation.MaxReasonLength + 1), DateTimeOffset.UtcNow));
+        Assert.Throws<ValidationException>(
+            () => complaint.Cancel(ComplaintCancellationVO.Create(Guid.NewGuid(), new string('x', CancellationRules.MaxReasonLength + 1), DateTimeOffset.UtcNow)));
     }
 
     [Fact]
@@ -79,11 +98,11 @@ public class ComplaintCancellationTests
     {
         var ownerId = Guid.NewGuid();
         var complaint = CreateOwnedComplaint(ownerId);
-        var service = new ComplaintCancellationService();
+        var service = new ComplaintCancellationService(TimeProvider.System);
 
         Assert.True(service.CanCancel(complaint, ownerId, actorIsAdmin: false));
 
-        service.Cancel(complaint, ownerId, actorIsAdmin: false, "No longer needed.", DateTimeOffset.UtcNow);
+        service.Cancel(complaint, ownerId, actorIsAdmin: false, "No longer needed.");
 
         Assert.True(complaint.IsCanceled);
     }
@@ -93,11 +112,11 @@ public class ComplaintCancellationTests
     {
         var complaint = CreateOwnedComplaint();
         var adminId = Guid.NewGuid();
-        var service = new ComplaintCancellationService();
+        var service = new ComplaintCancellationService(TimeProvider.System);
 
         Assert.True(service.CanCancel(complaint, adminId, actorIsAdmin: true));
 
-        service.Cancel(complaint, adminId, actorIsAdmin: true, "Spam.", DateTimeOffset.UtcNow);
+        service.Cancel(complaint, adminId, actorIsAdmin: true, "Spam.");
 
         Assert.True(complaint.IsCanceled);
     }
@@ -106,12 +125,12 @@ public class ComplaintCancellationTests
     public void Service_Stranger_CannotCancel()
     {
         var complaint = CreateOwnedComplaint();
-        var service = new ComplaintCancellationService();
+        var service = new ComplaintCancellationService(TimeProvider.System);
 
         Assert.False(service.CanCancel(complaint, Guid.NewGuid(), actorIsAdmin: false));
 
         Assert.Throws<ComplaintCancellationDeniedException>(
-            () => service.Cancel(complaint, Guid.NewGuid(), actorIsAdmin: false, "Trying my luck.", DateTimeOffset.UtcNow));
+            () => service.Cancel(complaint, Guid.NewGuid(), actorIsAdmin: false, "Trying my luck."));
 
         Assert.False(complaint.IsCanceled);
     }
@@ -121,11 +140,11 @@ public class ComplaintCancellationTests
     {
         var ownerId = Guid.NewGuid();
         var complaint = CreateOwnedComplaint(ownerId);
-        var service = new ComplaintCancellationService();
-        service.Cancel(complaint, ownerId, actorIsAdmin: false, "Done.", DateTimeOffset.UtcNow);
+        var service = new ComplaintCancellationService(TimeProvider.System);
+        service.Cancel(complaint, ownerId, actorIsAdmin: false, "Done.");
 
         // Even an admin cannot cancel twice.
         Assert.Throws<ComplaintAlreadyCanceledException>(
-            () => service.Cancel(complaint, Guid.NewGuid(), actorIsAdmin: true, "Again.", DateTimeOffset.UtcNow));
+            () => service.Cancel(complaint, Guid.NewGuid(), actorIsAdmin: true, "Again."));
     }
 }

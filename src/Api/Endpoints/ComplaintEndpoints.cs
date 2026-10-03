@@ -1,5 +1,5 @@
-using JaReclamouHoje.Api.Authorization;
 using JaReclamouHoje.Application.Features.Complaints;
+using JaReclamouHoje.Application.Features.Complaints.Cancel;
 using JaReclamouHoje.Application.Features.Complaints.Create;
 using JaReclamouHoje.Application.Features.Complaints.GetAll;
 using JaReclamouHoje.Application.Features.Complaints.GetById;
@@ -7,6 +7,8 @@ using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace JaReclamouHoje.Api.Endpoints;
+
+public record CancelComplaintRequest(string Reason);
 
 public static class ComplaintEndpoints
 {
@@ -44,8 +46,19 @@ public static class ComplaintEndpoints
         {
             var complaint = await sender.Send(request, cancellationToken);
             return TypedResults.CreatedAtRoute(complaint, "GetComplaintById", new { id = complaint.Id });
-        }).WithName("CreateComplaint")
-        .RequireAuthorization(Policies.AdminOnly);
+        }).WithName("CreateComplaint");
+
+        group.MapPost("/{id}/cancel", async Task<Results<Ok<ComplaintResponse>, NotFound>> (
+            Guid id,
+            CancelComplaintRequest request,
+            ISender sender,
+            CancellationToken cancellationToken) =>
+        {
+            var complaint = await sender.Send(new CancelComplaintCommand(id, request.Reason), cancellationToken);
+            return complaint is null
+                ? TypedResults.NotFound()
+                : TypedResults.Ok(complaint);
+        }).WithName("CancelComplaint");
 
         return group;
     }

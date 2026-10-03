@@ -6,10 +6,10 @@ public record ComplaintResponse(
     Guid Id,
     string Title,
     string Description,
-    ComplaintStatus Status,
-    DateTime CreatedAt
+    bool IsCanceled,
+    DateTimeOffset CreatedAt
 )
 {
     public static ComplaintResponse FromEntity(Complaint complaint) =>
-        new(complaint.Id, complaint.Title, complaint.Description, complaint.Status, complaint.CreatedAt);
+        new(complaint.Id, complaint.Title, complaint.Description, complaint.IsCanceled, complaint.CreatedAt);
 }

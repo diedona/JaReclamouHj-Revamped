@@ -1,4 +1,7 @@
+using FluentValidation;
 using JaReclamouHoje.Domain.Exceptions;
+using JaReclamouHoje.Domain.Entities.Validation;
+using JaReclamouHoje.Domain.ValueObjects;
 
 namespace JaReclamouHoje.Domain.Entities;
 
@@ -9,7 +12,7 @@ public sealed class Complaint
     public string Description { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
     public Guid CreatedByUserId { get; private set; }
-    public ComplaintCancellation? Cancellation { get; private set; }
+    public ComplaintCancellationVO? Cancellation { get; private set; }
 
     /// <summary>True once the complaint has been canceled (one-time terminal operation).</summary>
     public bool IsCanceled => Cancellation is not null;
@@ -25,38 +28,42 @@ public sealed class Complaint
         string title,
         string description,
         DateTimeOffset createdAt,
-        Guid createdByUserId = default,
-        ComplaintCancellation? cancellation = null)
+        Guid createdByUserId,
+        ComplaintCancellationVO? cancellation)
     {
-        if (id == Guid.Empty)
-            throw new ArgumentException("Complaint id must not be empty.", nameof(id));
-
-        if (string.IsNullOrWhiteSpace(title))
-            throw new ArgumentException("Complaint title is required.", nameof(title));
-
-        if (string.IsNullOrWhiteSpace(description))
-            throw new ArgumentException("Complaint description is required.", nameof(description));
-
+        // Dumb constructor: normalization only. Input-shape validation lives in
+        // ComplaintValidator (Domain backstop) and Application command validators.
         Id = id;
-        Title = title.Trim();
-        Description = description.Trim();
+        Title = (title ?? string.Empty).Trim();
+        Description = (description ?? string.Empty).Trim();
         CreatedAt = createdAt;
         CreatedByUserId = createdByUserId;
         Cancellation = cancellation;
     }
 
-    public static Complaint Create(string title, string description, Guid createdByUserId)
+    /// <summary>
+    /// Validating factory. Throws <see cref="ValidationException"/> on invalid input.
+    /// Prefer over the raw constructor on all Domain paths.
+    /// </summary>
+    public static Complaint Create(
+        string title,
+        string description,
+        Guid createdByUserId,
+        TimeProvider? timeProvider = null)
     {
-        if (createdByUserId == Guid.Empty)
-            throw new ArgumentException("Owner user id is required to create a complaint.", nameof(createdByUserId));
+        var clock = timeProvider ?? TimeProvider.System;
 
-        return new Complaint(
+        var complaint = new Complaint(
             Guid.NewGuid(),
             title,
             description,
-            DateTimeOffset.UtcNow,
-            createdByUserId
+            clock.GetUtcNow(),
+            createdByUserId,
+            cancellation: null
         );
+
+        new ComplaintValidator().ValidateAndThrow(complaint);
+        return complaint;
     }
 
     /// <summary>
@@ -65,7 +72,7 @@ public sealed class Complaint
     /// Authorization (owner-or-admin) is enforced by
     /// <see cref="Services.ComplaintCancellationService"/>, not here.
     /// </summary>
-    public void Cancel(ComplaintCancellation cancellation)
+    public void Cancel(ComplaintCancellationVO cancellation)
     {
         ArgumentNullException.ThrowIfNull(cancellation);
 
@@ -74,10 +81,6 @@ public sealed class Complaint
 
         Cancellation = cancellation;
     }
-
-    /// <summary>Convenience overload that builds the <see cref="ComplaintCancellation"/> value object.</summary>
-    public void Cancel(Guid canceledByUserId, string reason, DateTimeOffset canceledAt) =>
-        Cancel(new ComplaintCancellation(canceledByUserId, reason, canceledAt));
 
     public bool IsOwnedBy(Guid userId) => userId != Guid.Empty && CreatedByUserId == userId;
 }
