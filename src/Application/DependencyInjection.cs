@@ -12,7 +12,7 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.TryAddSingleton(TimeProvider.System);
-        services.TryAddSingleton<ComplaintCancellationService>();
+        services.AddScoped<ComplaintCancellationService>();
 
         services.AddMediatR(cfg =>
         {
