@@ -50,3 +50,13 @@ Clean Architecture with dependency direction: **Domain → Application → Infra
 - **.vs/ folder** is tracked — it contains Visual Studio workspace files
 - **Always boot-test with `dotnet run --project Api` from `src/`** — never exec the compiled `bin/.../JaReclamouHoje.Api.dll` from a random working directory. Content root follows the CWD, so a wrong CWD hides `appsettings.json`: Serilog's `ReadFrom.Configuration` finds no `Serilog` section → zero sinks → silent console, which reads as a "hang"/"crash" while the app is actually serving (or failing startup invisibly). A fallback Console sink in `AddSerilog()` keeps the logger noisy instead of mute.
 - **Before diagnosing a startup hang**, confirm it's real: check for `Now listening` in logs, `curl /api/complaints`, and check the process (Kestrel Heartbeat/SocketEngine threads run even with a silent logger). Slow cold-start + silent logger has produced several false "hang" reports.
+
+## Agent skills
+
+### Issue tracker
+
+Issues for this repo live on GitHub (`diedona/JaReclamouHj-Revamped`) and are managed via the `gh` CLI (not yet installed in the dev environment). See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context: one `GLOSSARY.md` at the repo root and ADRs in `docs/adr/`. See `docs/agents/domain.md`.
